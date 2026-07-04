@@ -1,8 +1,8 @@
 """
 Phase 18: Streamlit Web Application.
 Implements the interactive clinician dashboard app.py under streamlit_app/.
-Features single-page demographics inputs, drag-and-drop image uploads, diagnostic predictions,
-side-by-side Grad-CAM visualizations, and printable HTML report compilation.
+Features two-page session navigation: line-by-line input collection on Page 1,
+and diagnostic analysis / explainability visualizations on Page 2.
 """
 
 import sys
@@ -39,12 +39,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom premium CSS styling overrides (Vibrant Light Gradient Theme, Full BaseWeb Selectbox Fix)
+# Custom premium CSS styling overrides (Multi-Page Navigation & Line-by-Line Forms)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
     
-    /* 1. Global Page Background & Vibrant Multi-Gradient Canvas */
+    /* 1. Global Page Background & Soft Multi-Gradient Canvas */
     .stApp {
         background: linear-gradient(135deg, #e0f2fe 0%, #e6eff5 50%, #f0fdf4 100%) !important;
         background-attachment: fixed !important;
@@ -62,7 +62,7 @@ st.markdown("""
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 4rem !important;
-        max-width: 1280px !important;
+        max-width: 1100px !important;
         animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
     
@@ -71,7 +71,7 @@ st.markdown("""
         to { opacity: 1; transform: translateY(0); }
     }
     
-    /* 2. Universal Text Contrast & Visibility Overrides */
+    /* 2. Text Visibility Guarantees Across All Streamlit Elements */
     p, span, label, h1, h2, h3, h4, h5, h6, input, select, option,
     div[data-testid="stMarkdownContainer"] p,
     div[data-testid="stWidgetLabel"] label,
@@ -91,7 +91,7 @@ st.markdown("""
         color: #0f172a !important;
     }
     
-    /* 3. Top Header Hero Banner with Rich Cyan-Teal Gradient */
+    /* 3. Top Header Hero Banner */
     .hero-banner {
         background: linear-gradient(135deg, #0f172a 0%, #0369a1 45%, #0d9488 100%) !important;
         padding: 32px 40px;
@@ -108,7 +108,7 @@ st.markdown("""
         color: white !important;
     }
     .hero-title {
-        font-size: 34px;
+        font-size: 32px;
         font-weight: 700;
         letter-spacing: -0.8px;
         background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
@@ -118,7 +118,7 @@ st.markdown("""
     }
     .hero-subtitle {
         margin: 6px 0 0 0;
-        font-size: 15px;
+        font-size: 14px;
         color: #e2e8f0 !important;
         font-weight: 400 !important;
     }
@@ -136,36 +136,51 @@ st.markdown("""
         gap: 8px;
     }
     
-    /* 4. Streamlit Native Bordered Containers as Gradient Cards */
+    /* 4. Line-by-Line Section Card Wrappers */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: linear-gradient(135deg, #ffffff 0%, #f0f7fc 100%) !important;
         border: 1.5px solid #cbd5e1 !important;
-        border-radius: 20px !important;
-        padding: 24px !important;
-        margin-bottom: 20px !important;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05) !important;
+        border-radius: 18px !important;
+        padding: 20px 24px !important;
+        margin-bottom: 16px !important;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04) !important;
         transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-testid="stVerticalBlockBorderWrapper"]:hover {
         transform: translateY(-2px) !important;
         border-color: #0d9488 !important;
-        box-shadow: 0 15px 32px rgba(13, 148, 136, 0.12) !important;
+        box-shadow: 0 12px 28px rgba(13, 148, 136, 0.12) !important;
     }
     
-    /* Section Title Gradient Text */
     .section-header {
         font-family: 'Outfit', sans-serif;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         background: linear-gradient(135deg, #0369a1 0%, #0d9488 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 16px;
-        padding-bottom: 8px;
+        margin-bottom: 12px;
+        padding-bottom: 6px;
         border-bottom: 2px solid #e2e8f0;
         display: flex;
         align-items: center;
         gap: 10px;
+    }
+    
+    /* Patient Context Summary Bar on Results Page */
+    .patient-summary-bar {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 16px;
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
+    }
+    .patient-summary-bar span, .patient-summary-bar strong {
+        color: white !important;
     }
     
     /* 5. Complete BaseWeb Selectbox Popover & Dropdown Fix */
@@ -182,7 +197,6 @@ st.markdown("""
         color: #0f172a !important;
     }
     
-    /* BaseWeb Popover / Dropdown Menu Items */
     div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {
         background-color: #ffffff !important;
         border: 1.5px solid #0d9488 !important;
@@ -217,7 +231,7 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* 6. File Uploader Custom Light Gradient Dropzone */
+    /* 6. File Uploader Custom Light Dropzone */
     div[data-testid="stFileUploader"], 
     div[data-testid="stFileUploader"] section, 
     div[data-testid="stFileUploaderDropzone"],
@@ -365,7 +379,7 @@ st.markdown("""
         margin-bottom: 6px;
     }
     
-    /* 8. Medical Action Button with Teal Gradient */
+    /* 8. Medical Action Button with White Text */
     @keyframes pulse-glow {
         0% { box-shadow: 0 0 0 0 rgba(3, 105, 161, 0.4); }
         70% { box-shadow: 0 0 0 12px rgba(3, 105, 161, 0); }
@@ -437,270 +451,339 @@ config_file = os.path.join(project_root, "configs", "default_config.yaml")
 checkpoints_exist = os.path.exists(model_file) and os.path.exists(preprocessor_file)
 
 # =====================================================================
-# MAIN USER INTERFACE LAYOUT
+# SESSION STATE NAVIGATION INITIALIZATION
 # =====================================================================
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "input"
 
-# 1. Top Hero Banner
-st.markdown("""
-<div class="hero-banner">
-    <div>
-        <div class="hero-title">SkinCancerAI Clinical Diagnostic Console</div>
-        <div class="hero-subtitle">Multi-Modal Deep Learning System • Dual CNN-Vision Transformer Fusion • Explainable AI</div>
+if "patient_id" not in st.session_state:
+    st.session_state.patient_id = "CASE_2026_883"
+
+if "age" not in st.session_state:
+    st.session_state.age = 45
+
+if "sex" not in st.session_state:
+    st.session_state.sex = "Male"
+
+if "localization" not in st.session_state:
+    st.session_state.localization = "Back"
+
+if "uploaded_file" not in st.session_state:
+    st.session_state.uploaded_file = None
+
+
+# =====================================================================
+# PAGE 1: LINE-BY-LINE CASE INPUT FORM
+# =====================================================================
+if st.session_state.current_page == "input":
+    # Hero Banner
+    st.markdown("""
+    <div class="hero-banner">
+        <div>
+            <div class="hero-title">SkinCancerAI Clinical Diagnostic Console</div>
+            <div class="hero-subtitle">Step 1 of 2: Line-by-Line Patient Case Entry & Dermoscopic Image Upload</div>
+        </div>
+        <div class="hero-badge">
+            <span>●</span> Form Entry Mode
+        </div>
     </div>
-    <div class="hero-badge">
-        <span>●</span> GPU Accelerated (GTX 1650)
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# 2. Adjusted Demographics Card (Consolidated Bordered Container)
-with st.container(border=True):
-    st.markdown('<div class="section-header">👤 Patient Demographic Parameters</div>', unsafe_allow_html=True)
-    col_demo1, col_demo2, col_demo3, col_demo4 = st.columns(4)
-
-    with col_demo1:
-        patient_id = st.text_input("Patient Case ID", value="CASE_2026_883")
-
-    with col_demo2:
-        age = st.slider("Patient Age (Years)", min_value=0, max_value=100, value=45)
-
-    with col_demo3:
-        sex = st.selectbox("Biological Sex", ["Male", "Female", "Unknown"])
-
-    with col_demo4:
-        localization = st.selectbox(
-            "Anatomical Site",
-            [
-                "Back", "Abdomen", "Chest", "Face", "Neck", "Scalp", "Trunk",
-                "Upper Extremity", "Lower Extremity", "Hand", "Foot", "Genital", "Acral",
-                "Ear", "Unknown"
-            ]
+    if not checkpoints_exist:
+        st.warning(
+            "⚠️ Trained checkpoints not found in checkpoints/! Please run the training pipeline first."
         )
 
-if not checkpoints_exist:
-    st.warning(
-        "⚠️ Trained checkpoints not found! Please run the training pipeline to "
-        "generate the best model weights and metadata preprocessor pickle."
-    )
-
-# 3. Two-Column Workspace Layout (Image Upload & Diagnostic Pipeline)
-col_left, col_right = st.columns([1, 1])
-
-with col_left:
+    # Line 1: Patient Case ID
     with st.container(border=True):
-        st.markdown('<div class="section-header">📷 Dermoscopic Image Input</div>', unsafe_allow_html=True)
-        uploaded_file = st.file_uploader(
-            "Upload raw skin lesion photograph (JPG, JPEG, PNG format)",
+        st.markdown('<div class="section-header">1. Patient Case Identification</div>', unsafe_allow_html=True)
+        patient_id_val = st.text_input("Enter unique medical record / case identifier", value=st.session_state.patient_id)
+        st.session_state.patient_id = patient_id_val
+
+    # Line 2: Patient Age
+    with st.container(border=True):
+        st.markdown('<div class="section-header">2. Patient Age Demographics</div>', unsafe_allow_html=True)
+        age_val = st.slider("Select biological age of the patient (Years)", min_value=0, max_value=100, value=int(st.session_state.age))
+        st.session_state.age = age_val
+
+    # Line 3: Biological Sex
+    with st.container(border=True):
+        st.markdown('<div class="section-header">3. Biological Sex Specification</div>', unsafe_allow_html=True)
+        sex_idx = ["Male", "Female", "Unknown"].index(st.session_state.sex) if st.session_state.sex in ["Male", "Female", "Unknown"] else 0
+        sex_val = st.selectbox("Select patient biological sex category", ["Male", "Female", "Unknown"], index=sex_idx)
+        st.session_state.sex = sex_val
+
+    # Line 4: Anatomical Site
+    with st.container(border=True):
+        st.markdown('<div class="section-header">4. Anatomical Site Localization</div>', unsafe_allow_html=True)
+        loc_options = [
+            "Back", "Abdomen", "Chest", "Face", "Neck", "Scalp", "Trunk",
+            "Upper Extremity", "Lower Extremity", "Hand", "Foot", "Genital", "Acral",
+            "Ear", "Unknown"
+        ]
+        loc_idx = loc_options.index(st.session_state.localization) if st.session_state.localization in loc_options else 0
+        loc_val = st.selectbox("Select primary body lesion site", loc_options, index=loc_idx)
+        st.session_state.localization = loc_val
+
+    # Line 5: Dermoscopic Image Upload
+    with st.container(border=True):
+        st.markdown('<div class="section-header">5. Dermoscopic Image Photograph</div>', unsafe_allow_html=True)
+        uploaded_file_val = st.file_uploader(
+            "Upload raw high-resolution skin lesion photograph (JPG, JPEG, PNG format)",
             type=["jpg", "jpeg", "png"]
         )
-        
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Lesion Photograph Context", use_container_width=True)
+        if uploaded_file_val is not None:
+            st.session_state.uploaded_file = uploaded_file_val
+            image_preview = Image.open(uploaded_file_val)
+            st.image(image_preview, caption="Uploaded Lesion Photograph Preview", width=350)
 
-with col_right:
-    with st.container(border=True):
-        st.markdown('<div class="section-header">⚡ Diagnostic Analysis & XAI</div>', unsafe_allow_html=True)
-        
-        if uploaded_file is None:
-            st.info("ℹ️ Please upload a dermoscopic image photograph above to initiate multi-stage validation and AI inference.")
+    st.markdown("---")
+    
+    # Submit Action Button
+    submit_btn = st.button("🚀 Submit Case Parameters & View AI Diagnostics", use_container_width=True)
+    if submit_btn:
+        if st.session_state.uploaded_file is None:
+            st.error("❌ Please upload a dermoscopic image in Line 5 above before submitting.")
         elif not checkpoints_exist:
-            st.error("❌ Diagnostic engine cannot launch because pre-trained weights are missing from checkpoints/.")
+            st.error("❌ Cannot process diagnostics: Model weights missing from checkpoints/.")
         else:
-            run_btn = st.button("🚀 Run Multi-Modal Diagnostic Analysis", use_container_width=True)
+            st.session_state.current_page = "results"
+            st.rerun()
+
+
+# =====================================================================
+# PAGE 2: DIAGNOSTIC RESULTS & CLINICAL EXPLAINABILITY
+# =====================================================================
+elif st.session_state.current_page == "results":
+    # Top Navigation Header
+    col_nav1, col_nav2 = st.columns([1, 4])
+    with col_nav1:
+        if st.button("← Edit Patient Inputs", use_container_width=True):
+            st.session_state.current_page = "input"
+            st.rerun()
+
+    # Hero Banner
+    st.markdown("""
+    <div class="hero-banner">
+        <div>
+            <div class="hero-title">SkinCancerAI Clinical Diagnostic Console</div>
+            <div class="hero-subtitle">Step 2 of 2: AI Multi-Modal Diagnostics, Grad-CAM Visualizations & Clinical Guidelines</div>
+        </div>
+        <div class="hero-badge">
+            <span>●</span> Results Display
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Patient Context Summary Bar
+    st.markdown(f"""
+    <div class="patient-summary-bar">
+        <div><strong>Patient ID:</strong> <span>{st.session_state.patient_id}</span></div>
+        <div><strong>Age:</strong> <span>{st.session_state.age} Years</span></div>
+        <div><strong>Sex:</strong> <span>{st.session_state.sex}</span></div>
+        <div><strong>Site:</strong> <span>{st.session_state.localization}</span></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Load image
+    image = Image.open(st.session_state.uploaded_file)
+    
+    with st.spinner("Executing multi-stage validation and neural forward pass..."):
+        try:
+            engine = load_inference_engine(
+                config_path=config_file,
+                model_path=model_file,
+                preprocessor_path=preprocessor_file,
+                cache_buster=8
+            )
             
-            if run_btn:
-                with st.spinner("Executing multi-stage validation and neural forward pass..."):
-                    try:
-                        engine = load_inference_engine(
-                            config_path=config_file,
-                            model_path=model_file,
-                            preprocessor_path=preprocessor_file,
-                            cache_buster=7
-                        )
-                        
-                        temp_img_path = os.path.join(project_root, "temp_lesion.jpg")
-                        image.convert("RGB").save(temp_img_path)
-                        
-                        is_valid, validation_results = engine.run_pipeline_validation(temp_img_path)
-                        
-                        st.markdown("### 📋 Multi-Stage Validation Pipeline")
-                        
-                        val_res = validation_results["image_validation"]
-                        step1_class = "step-success" if val_res["passed"] else "step-fail"
-                        step1_icon = "✓" if val_res["passed"] else "✗"
-                        step1_sub = f"Size: {val_res['metrics'].get('width')}x{val_res['metrics'].get('height')}" if val_res["passed"] else val_res["message"]
+            temp_img_path = os.path.join(project_root, "temp_lesion.jpg")
+            image.convert("RGB").save(temp_img_path)
+            
+            is_valid, validation_results = engine.run_pipeline_validation(temp_img_path)
+            
+            with st.container(border=True):
+                st.markdown('<div class="section-header">📋 Multi-Stage Image Validation Pipeline</div>', unsafe_allow_html=True)
+                
+                val_res = validation_results["image_validation"]
+                step1_class = "step-success" if val_res["passed"] else "step-fail"
+                step1_icon = "✓" if val_res["passed"] else "✗"
+                step1_sub = f"Size: {val_res['metrics'].get('width')}x{val_res['metrics'].get('height')}" if val_res["passed"] else val_res["message"]
 
-                        skin_res = validation_results["skin_detection"]
-                        if skin_res["message"] == "Pending":
-                            step2_class = "step-pending"
-                            step2_icon = "—"
-                            step2_sub = "Pending"
-                        elif skin_res["passed"]:
-                            step2_class = "step-success"
-                            step2_icon = "✓"
-                            step2_sub = f"Skin Ratio: {skin_res['metrics'].get('skin_ratio', 0.0)*100:.1f}%"
-                        else:
-                            step2_class = "step-fail"
-                            step2_icon = "✗"
-                            step2_sub = skin_res["message"]
+                skin_res = validation_results["skin_detection"]
+                if skin_res["message"] == "Pending":
+                    step2_class = "step-pending"
+                    step2_icon = "—"
+                    step2_sub = "Pending"
+                elif skin_res["passed"]:
+                    step2_class = "step-success"
+                    step2_icon = "✓"
+                    step2_sub = f"Skin Ratio: {skin_res['metrics'].get('skin_ratio', 0.0)*100:.1f}%"
+                else:
+                    step2_class = "step-fail"
+                    step2_icon = "✗"
+                    step2_sub = skin_res["message"]
 
-                        lesion_res = validation_results["lesion_detection"]
-                        if lesion_res["message"] == "Pending":
-                            step3_class = "step-pending"
-                            step3_icon = "—"
-                            step3_sub = "Pending"
-                        elif lesion_res["passed"]:
-                            step3_class = "step-success"
-                            step3_icon = "✓"
-                            step3_sub = f"Lesion Ratio: {lesion_res['metrics'].get('max_lesion_area_ratio', 0.0)*100:.2f}%"
-                        else:
-                            step3_class = "step-fail"
-                            step3_icon = "✗"
-                            step3_sub = lesion_res["message"]
+                lesion_res = validation_results["lesion_detection"]
+                if lesion_res["message"] == "Pending":
+                    step3_class = "step-pending"
+                    step3_icon = "—"
+                    step3_sub = "Pending"
+                elif lesion_res["passed"]:
+                    step3_class = "step-success"
+                    step3_icon = "✓"
+                    step3_sub = f"Lesion Ratio: {lesion_res['metrics'].get('max_lesion_area_ratio', 0.0)*100:.2f}%"
+                else:
+                    step3_class = "step-fail"
+                    step3_icon = "✗"
+                    step3_sub = lesion_res["message"]
 
-                        step4_class = "step-success" if is_valid else "step-pending"
-                        step4_icon = "✓" if is_valid else "—"
-                        step4_sub = "Executed" if is_valid else "Skipped"
+                step4_class = "step-success" if is_valid else "step-pending"
+                step4_icon = "✓" if is_valid else "—"
+                step4_sub = "Executed" if is_valid else "Skipped"
 
-                        st.markdown(f"""
-                        <div class="stepper-container">
-                            <div class="stepper-card {step1_class}">
-                                <div class="step-num">1</div>
-                                <div class="step-title">Image Check</div>
-                                <div class="step-icon">{step1_icon}</div>
-                                <div class="step-desc">{step1_sub}</div>
-                            </div>
-                            <div class="stepper-card {step2_class}">
-                                <div class="step-num">2</div>
-                                <div class="step-title">Skin Search</div>
-                                <div class="step-icon">{step2_icon}</div>
-                                <div class="step-desc">{step2_sub}</div>
-                            </div>
-                            <div class="stepper-card {step3_class}">
-                                <div class="step-num">3</div>
-                                <div class="step-title">Lesion Focus</div>
-                                <div class="step-icon">{step3_icon}</div>
-                                <div class="step-desc">{step3_sub}</div>
-                            </div>
-                            <div class="stepper-card {step4_class}">
-                                <div class="step-num">4</div>
-                                <div class="step-title">Inference</div>
-                                <div class="step-icon">{step4_icon}</div>
-                                <div class="step-desc">{step4_sub}</div>
-                            </div>
+                st.markdown(f"""
+                <div class="stepper-container">
+                    <div class="stepper-card {step1_class}">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Image Check</div>
+                        <div class="step-icon">{step1_icon}</div>
+                        <div class="step-desc">{step1_sub}</div>
+                    </div>
+                    <div class="stepper-card {step2_class}">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Skin Search</div>
+                        <div class="step-icon">{step2_icon}</div>
+                        <div class="step-desc">{step2_sub}</div>
+                    </div>
+                    <div class="stepper-card {step3_class}">
+                        <div class="step-num">3</div>
+                        <div class="step-title">Lesion Focus</div>
+                        <div class="step-icon">{step3_icon}</div>
+                        <div class="step-desc">{step3_sub}</div>
+                    </div>
+                    <div class="stepper-card {step4_class}">
+                        <div class="step-num">4</div>
+                        <div class="step-title">Inference</div>
+                        <div class="step-icon">{step4_icon}</div>
+                        <div class="step-desc">{step4_sub}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            if not is_valid:
+                if os.path.exists(temp_img_path):
+                    os.remove(temp_img_path)
+                st.error("❌ Diagnostics halted: The uploaded image failed validation checks. Refer to status cards above.")
+                st.stop()
+
+            pred_class, probs, report_path = engine.predict_and_explain(
+                image_path=temp_img_path,
+                age=float(st.session_state.age),
+                sex=st.session_state.sex.lower(),
+                localization=st.session_state.localization.lower(),
+                patient_id=st.session_state.patient_id,
+                report_filename=f"{st.session_state.patient_id}_clinical_report.html"
+            )
+            
+            if os.path.exists(temp_img_path):
+                os.remove(temp_img_path)
+
+            img_tensor = engine.image_transform(image.convert("RGB")).unsqueeze(0).to(engine.device)
+            patient_df = pd.DataFrame([{"age": float(st.session_state.age), "sex": st.session_state.sex.lower(), "localization": st.session_state.localization.lower()}])
+            meta_tensor = engine.preprocessor.transform(patient_df).to(engine.device)
+            
+            target_layer = engine.model.cnn_extractor.features[-1]
+            gradcam = GradCAM(model=engine.model, target_layer=target_layer)
+            
+            heatmap, pred_idx, base_confidence = gradcam.generate_heatmap(img_tensor, meta_tensor)
+            raw_np = np.array(image.convert("RGB").resize((engine.config.data.image_size, engine.config.data.image_size)))
+            blended_np = GradCAM.overlay_heatmap(image_np=raw_np, heatmap=heatmap, alpha=0.45)
+            gradcam.remove_hooks()
+
+            disease_info = engine.report_generator.DISEASE_INFO.get(pred_class, {})
+            is_malignant = "Malignant" in disease_info.get("severity", "")
+            is_undetermined = "Undetermined" in disease_info.get("severity", "")
+            badge_style = "badge-malignant" if is_malignant else "badge-warning" if is_undetermined else "badge-benign"
+            
+            st.success("✅ Multi-modal diagnostics compiled!")
+            
+            confidence_val = probs.get(pred_class, max(probs.values()))
+            
+            with st.container(border=True):
+                if pred_class == "unknown":
+                    st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); padding: 24px; border-radius: 18px; margin-bottom: 10px; border: 1.5px solid #fecaca; box-shadow: 0 4px 15px rgba(229, 62, 62, 0.08);">
+                        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #c53030; font-weight: 700; margin-bottom: 6px;">Primary Diagnostic Prediction</div>
+                        <div style="font-size: 26px; font-weight: 700; color: #9b1c1c; margin: 4px 0; font-family: 'Outfit', sans-serif;">{disease_info.get('name', 'Unknown Category (Low Confidence)')}</div>
+                        <div style="margin-top: 12px; display: flex; align-items: center; gap: 15px;">
+                            <span class="badge {badge_style}">{disease_info.get('severity', 'Undetermined')}</span>
+                            <span style="font-weight: 600; font-size: 15px; color: #c53030;">{(confidence_val*100):.2f}% Calibrated Confidence (Below Threshold)</span>
                         </div>
-                        """, unsafe_allow_html=True)
-                        
-                        if not is_valid:
-                            if os.path.exists(temp_img_path):
-                                os.remove(temp_img_path)
-                            st.error("❌ Diagnostics halted: The uploaded image failed validation checks. Refer to status cards above.")
-                            st.stop()
-
-                        pred_class, probs, report_path = engine.predict_and_explain(
-                            image_path=temp_img_path,
-                            age=float(age),
-                            sex=sex.lower(),
-                            localization=localization.lower(),
-                            patient_id=patient_id,
-                            report_filename=f"{patient_id}_clinical_report.html"
-                        )
-                        
-                        if os.path.exists(temp_img_path):
-                            os.remove(temp_img_path)
-
-                        img_tensor = engine.image_transform(image.convert("RGB")).unsqueeze(0).to(engine.device)
-                        patient_df = pd.DataFrame([{"age": float(age), "sex": sex.lower(), "localization": localization.lower()}])
-                        meta_tensor = engine.preprocessor.transform(patient_df).to(engine.device)
-                        
-                        target_layer = engine.model.cnn_extractor.features[-1]
-                        gradcam = GradCAM(model=engine.model, target_layer=target_layer)
-                        
-                        heatmap, pred_idx, base_confidence = gradcam.generate_heatmap(img_tensor, meta_tensor)
-                        raw_np = np.array(image.convert("RGB").resize((engine.config.data.image_size, engine.config.data.image_size)))
-                        blended_np = GradCAM.overlay_heatmap(image_np=raw_np, heatmap=heatmap, alpha=0.45)
-                        gradcam.remove_hooks()
-
-                        disease_info = engine.report_generator.DISEASE_INFO.get(pred_class, {})
-                        is_malignant = "Malignant" in disease_info.get("severity", "")
-                        is_undetermined = "Undetermined" in disease_info.get("severity", "")
-                        badge_style = "badge-malignant" if is_malignant else "badge-warning" if is_undetermined else "badge-benign"
-                        
-                        st.success("✅ Multi-modal diagnostics compiled!")
-                        
-                        confidence_val = probs.get(pred_class, max(probs.values()))
-                        
-                        if pred_class == "unknown":
-                            st.markdown(f"""
-                            <div style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); padding: 24px; border-radius: 18px; margin-bottom: 25px; border: 1.5px solid #fecaca; box-shadow: 0 4px 15px rgba(229, 62, 62, 0.08);">
-                                <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #c53030; font-weight: 700; margin-bottom: 6px;">Primary Diagnostic Prediction</div>
-                                <div style="font-size: 26px; font-weight: 700; color: #9b1c1c; margin: 4px 0; font-family: 'Outfit', sans-serif;">{disease_info.get('name', 'Unknown Category (Low Confidence)')}</div>
-                                <div style="margin-top: 12px; display: flex; align-items: center; gap: 15px;">
-                                    <span class="badge {badge_style}">{disease_info.get('severity', 'Undetermined')}</span>
-                                    <span style="font-weight: 600; font-size: 15px; color: #c53030;">{(confidence_val*100):.2f}% Calibrated Confidence (Below Threshold)</span>
-                                </div>
-                                <p style="margin-top: 18px; font-size: 14px; color: #742a2a; line-height: 1.6; font-style: italic; border-top: 1px solid rgba(229, 62, 62, 0.15); padding-top: 12px;">
-                                    <strong>System Note:</strong> {disease_info.get('guideline')}
-                                </p>
-                            </div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            st.markdown(f"""
-                            <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%); padding: 24px; border-radius: 18px; margin-bottom: 25px; border: 1.5px solid #bae6fd; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08);">
-                                <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #0369a1; font-weight: 700; margin-bottom: 6px;">Predicted Diagnosis</div>
-                                <div style="font-size: 28px; font-weight: 700; color: #0c4a6e; margin: 4px 0; font-family: 'Outfit', sans-serif;">{disease_info.get('name', pred_class)}</div>
-                                <div style="margin-top: 12px; display: flex; align-items: center; gap: 15px;">
-                                    <span class="badge {badge_style}">{disease_info.get('severity', 'Benign')}</span>
-                                    <span style="font-weight: 600; font-size: 16px; color: #0284c7;">{(confidence_val*100):.2f}% Calibrated Confidence</span>
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
-
-                        st.markdown("### 🔍 Explainable AI Visualizations")
-                        col_img1, col_img2 = st.columns(2)
-                        with col_img1:
-                            st.image(raw_np, caption="Original Dermoscopic Input", use_container_width=True)
-                        with col_img2:
-                            st.image(blended_np, caption="Grad-CAM CNN Hotspot Overlay", use_container_width=True)
-
-                        st.markdown("### 📊 Probability Distribution")
-                        sorted_probs = sorted(probs.items(), key=lambda item: item[1], reverse=True)
-                        for code, val in sorted_probs:
-                            name = engine.report_generator.DISEASE_INFO.get(code, {}).get("name", code)
-                            pct = val * 100
-                            bar_color = "#ef4444" if code in ["mel", "bcc", "akiec"] else "#10b981" if code in ["nv", "bkl"] else "#6366f1"
-                            st.markdown(f"""
-                            <div class="probability-label">{name} ({code.upper()})</div>
-                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                <div style="background-color: #cbd5e1; height: 10px; border-radius: 5px; overflow: hidden; flex-grow: 1; border: 1px solid #94a3b8;">
-                                    <div style="width: {pct}%; height: 100%; background: {bar_color}; border-radius: 5px; box-shadow: 0 0 8px {bar_color}40;"></div>
-                                </div>
-                                <div style="font-weight: 700; width: 65px; text-align: right; font-size: 13px; color: #0f172a; font-family: 'Outfit', sans-serif; margin-left: 10px;">{pct:.2f}%</div>
-                            </div>
-                            """, unsafe_allow_html=True)
-
-                        st.markdown("### 📋 Clinical Notes & Guidelines")
-                        st.markdown(f"""
-                        <div class="guideline-box">
-                            <p style="margin: 0 0 10px 0; color: #0f172a;"><strong>Pathology Summary:</strong> {disease_info.get('desc')}</p>
-                            <p style="margin: 0; color: #0f766e;"><strong>Clinical Recommendation:</strong> {disease_info.get('guideline')}</p>
+                        <p style="margin-top: 18px; font-size: 14px; color: #742a2a; line-height: 1.6; font-style: italic; border-top: 1px solid rgba(229, 62, 62, 0.15); padding-top: 12px;">
+                            <strong>System Note:</strong> {disease_info.get('guideline')}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%); padding: 24px; border-radius: 18px; margin-bottom: 10px; border: 1.5px solid #bae6fd; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08);">
+                        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #0369a1; font-weight: 700; margin-bottom: 6px;">Predicted Diagnosis</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #0c4a6e; margin: 4px 0; font-family: 'Outfit', sans-serif;">{disease_info.get('name', pred_class)}</div>
+                        <div style="margin-top: 12px; display: flex; align-items: center; gap: 15px;">
+                            <span class="badge {badge_style}">{disease_info.get('severity', 'Benign')}</span>
+                            <span style="font-weight: 600; font-size: 16px; color: #0284c7;">{(confidence_val*100):.2f}% Calibrated Confidence</span>
                         </div>
-                        """, unsafe_allow_html=True)
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                        if os.path.exists(report_path):
-                            with open(report_path, "r", encoding="utf-8") as f:
-                                html_report = f.read()
-                            
-                            st.markdown("---")
-                            st.download_button(
-                                label="📥 Download Clinical Diagnostic Report (HTML)",
-                                data=html_report,
-                                file_name=f"clinical_report_{patient_id}.html",
-                                mime="text/html",
-                                use_container_width=True
-                            )
+            with st.container(border=True):
+                st.markdown('<div class="section-header">🔍 Explainable AI Visualizations</div>', unsafe_allow_html=True)
+                col_img1, col_img2 = st.columns(2)
+                with col_img1:
+                    st.image(raw_np, caption="Original Dermoscopic Input", use_container_width=True)
+                with col_img2:
+                    st.image(blended_np, caption="Grad-CAM CNN Hotspot Overlay", use_container_width=True)
 
-                    except Exception as e:
-                        st.error(f"An error occurred during diagnostics processing: {str(e)}")
-                        logger.exception("Streamlit inference processing error:")
+            with st.container(border=True):
+                st.markdown('<div class="section-header">📊 Calibrated Probability Distribution</div>', unsafe_allow_html=True)
+                sorted_probs = sorted(probs.items(), key=lambda item: item[1], reverse=True)
+                for code, val in sorted_probs:
+                    name = engine.report_generator.DISEASE_INFO.get(code, {}).get("name", code)
+                    pct = val * 100
+                    bar_color = "#ef4444" if code in ["mel", "bcc", "akiec"] else "#10b981" if code in ["nv", "bkl"] else "#6366f1"
+                    st.markdown(f"""
+                    <div class="probability-label">{name} ({code.upper()})</div>
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <div style="background-color: #cbd5e1; height: 10px; border-radius: 5px; overflow: hidden; flex-grow: 1; border: 1px solid #94a3b8;">
+                            <div style="width: {pct}%; height: 100%; background: {bar_color}; border-radius: 5px; box-shadow: 0 0 8px {bar_color}40;"></div>
+                        </div>
+                        <div style="font-weight: 700; width: 65px; text-align: right; font-size: 13px; color: #0f172a; font-family: 'Outfit', sans-serif; margin-left: 10px;">{pct:.2f}%</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            with st.container(border=True):
+                st.markdown('<div class="section-header">📋 Clinical Notes & Guidelines</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="guideline-box">
+                    <p style="margin: 0 0 10px 0; color: #0f172a;"><strong>Pathology Summary:</strong> {disease_info.get('desc')}</p>
+                    <p style="margin: 0; color: #0f766e;"><strong>Clinical Recommendation:</strong> {disease_info.get('guideline')}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+            if os.path.exists(report_path):
+                with open(report_path, "r", encoding="utf-8") as f:
+                    html_report = f.read()
+                
+                st.markdown("---")
+                st.download_button(
+                    label="📥 Download Clinical Diagnostic Report (HTML)",
+                    data=html_report,
+                    file_name=f"clinical_report_{st.session_state.patient_id}.html",
+                    mime="text/html",
+                    use_container_width=True
+                )
+
+        except Exception as e:
+            st.error(f"An error occurred during diagnostics processing: {str(e)}")
+            logger.exception("Streamlit inference processing error:")
