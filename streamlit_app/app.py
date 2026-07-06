@@ -747,16 +747,29 @@ elif st.session_state.current_page == "results":
 
             with st.container(border=True):
                 st.markdown('<div class="section-header">📊 Calibrated Probability Distribution</div>', unsafe_allow_html=True)
+                
+                # Distinct color palette for each disease category
+                disease_color_map = {
+                    "mel": "#ef4444",     # Melanoma: Crimson Red
+                    "nv": "#10b981",      # Melanocytic Nevus: Emerald Green
+                    "bcc": "#dc2626",     # Basal Cell Carcinoma: Deep Ruby Red
+                    "akiec": "#f97316",   # Actinic Keratoses: Amber Orange
+                    "bkl": "#14b8a6",     # Benign Keratosis: Mint Cyan
+                    "df": "#6366f1",      # Dermatofibroma: Royal Indigo
+                    "vasc": "#a855f7",    # Vascular Lesions: Vivid Purple
+                    "unknown": "#64748b"  # Low Confidence / Undetermined: Charcoal Slate
+                }
+                
                 sorted_probs = sorted(probs.items(), key=lambda item: item[1], reverse=True)
                 for code, val in sorted_probs:
                     name = engine.report_generator.DISEASE_INFO.get(code, {}).get("name", code)
                     pct = val * 100
-                    bar_color = "#ef4444" if code in ["mel", "bcc", "akiec"] else "#10b981" if code in ["nv", "bkl"] else "#6366f1"
+                    bar_color = disease_color_map.get(code.lower(), "#3b82f6")
                     st.markdown(f"""
                     <div class="probability-label">{name} ({code.upper()})</div>
                     <div style="display: flex; align-items: center; margin-bottom: 12px;">
                         <div style="background-color: #cbd5e1; height: 10px; border-radius: 5px; overflow: hidden; flex-grow: 1; border: 1px solid #94a3b8;">
-                            <div style="width: {pct}%; height: 100%; background: {bar_color}; border-radius: 5px; box-shadow: 0 0 8px {bar_color}40;"></div>
+                            <div style="width: {pct}%; height: 100%; background: {bar_color}; border-radius: 5px; box-shadow: 0 0 8px {bar_color}60;"></div>
                         </div>
                         <div style="font-weight: 700; width: 65px; text-align: right; font-size: 13px; color: #0f172a; font-family: 'Outfit', sans-serif; margin-left: 10px;">{pct:.2f}%</div>
                     </div>
