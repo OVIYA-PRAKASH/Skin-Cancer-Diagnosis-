@@ -46,7 +46,7 @@ st.markdown("""
     
     /* 1. Global Page Background & Soft Multi-Gradient Canvas */
     .stApp {
-        background: linear-gradient(135deg, #e0f2fe 0%, #e6eff5 50%, #f0fdf4 100%) !important;
+        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%) !important;
         background-attachment: fixed !important;
         color: #0f172a !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -93,12 +93,12 @@ st.markdown("""
     
     /* 3. Top Header Hero Banner */
     .hero-banner {
-        background: linear-gradient(135deg, #0f172a 0%, #0369a1 45%, #0d9488 100%) !important;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%) !important;
         padding: 32px 40px;
         border-radius: 20px;
         color: white;
         margin-bottom: 24px;
-        box-shadow: 0 14px 35px -10px rgba(3, 105, 161, 0.35);
+        box-shadow: 0 14px 35px -10px rgba(37, 99, 235, 0.35);
         border: 1px solid rgba(255, 255, 255, 0.15);
         display: flex;
         align-items: center;
@@ -111,7 +111,7 @@ st.markdown("""
         font-size: 32px;
         font-weight: 700;
         letter-spacing: -0.8px;
-        background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #bae6fd 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 0;
@@ -381,16 +381,16 @@ st.markdown("""
     
     /* 8. Medical Action Button with White Text */
     @keyframes pulse-glow {
-        0% { box-shadow: 0 0 0 0 rgba(3, 105, 161, 0.4); }
-        70% { box-shadow: 0 0 0 12px rgba(3, 105, 161, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(3, 105, 161, 0); }
+        0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+        70% { box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
     }
     
     .stButton > button, 
     .stDownloadButton > button, 
     div[data-testid="stDownloadButton"] > button,
     div[data-testid="stFormSubmitButton"] > button {
-        background: linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #0d9488 100%) !important;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%) !important;
         color: #ffffff !important;
         border: none !important;
         border-radius: 14px !important;
@@ -400,7 +400,7 @@ st.markdown("""
         text-transform: uppercase !important;
         letter-spacing: 0.8px !important;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        box-shadow: 0 6px 20px rgba(3, 105, 161, 0.3) !important;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3) !important;
         width: 100% !important;
     }
     .stButton > button *, 
@@ -418,7 +418,7 @@ st.markdown("""
     .stDownloadButton > button:hover, 
     div[data-testid="stDownloadButton"] > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 12px 28px rgba(3, 105, 161, 0.45) !important;
+        box-shadow: 0 12px 28px rgba(37, 99, 235, 0.45) !important;
         opacity: 0.96 !important;
     }
     .stButton > button:active,
