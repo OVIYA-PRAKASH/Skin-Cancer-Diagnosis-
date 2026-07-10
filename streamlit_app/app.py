@@ -46,7 +46,7 @@ st.markdown("""
     
     /* 1. Global Page Background & Soft Multi-Gradient Canvas */
     .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%) !important;
+        background: linear-gradient(135deg, #fffbf0 0%, #fef5f9 100%) !important;
         background-attachment: fixed !important;
         color: #0f172a !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
