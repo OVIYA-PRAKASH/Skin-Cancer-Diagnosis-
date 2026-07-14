@@ -59,6 +59,33 @@ st.markdown("""
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
     
+    /* Top Navigation Bar */
+    .top-nav {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 12px;
+        padding: 14px 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        margin-bottom: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .top-nav a {
+        text-decoration: none;
+        color: #1e293b !important;
+        font-weight: 700;
+        font-size: 15px;
+        transition: color 0.2s ease;
+        letter-spacing: 0.3px;
+    }
+    .top-nav a:hover {
+        color: #0ea5e9 !important;
+    }
+    
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 4rem !important;
@@ -470,6 +497,20 @@ if "localization" not in st.session_state:
 
 if "uploaded_file" not in st.session_state:
     st.session_state.uploaded_file = None
+
+
+# =====================================================================
+# GLOBAL TOP NAVIGATION BAR
+# =====================================================================
+st.markdown("""
+<div class="top-nav">
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+    <a href="#">Signup</a>
+    <a href="#">Login</a>
+</div>
+""", unsafe_allow_html=True)
 
 
 # =====================================================================
