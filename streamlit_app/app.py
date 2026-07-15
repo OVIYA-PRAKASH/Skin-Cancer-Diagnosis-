@@ -59,33 +59,6 @@ st.markdown("""
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
     
-    /* Top Navigation Bar */
-    .top-nav {
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 12px;
-        padding: 14px 24px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 40px;
-        margin-bottom: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-    .top-nav a {
-        text-decoration: none;
-        color: #1e293b !important;
-        font-weight: 700;
-        font-size: 15px;
-        transition: color 0.2s ease;
-        letter-spacing: 0.3px;
-    }
-    .top-nav a:hover {
-        color: #0ea5e9 !important;
-    }
-    
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 4rem !important;
@@ -120,25 +93,27 @@ st.markdown("""
     
     /* 3. Top Header Hero Banner */
     .hero-banner {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%) !important;
+        background: rgba(255, 255, 255, 0.6) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
         padding: 32px 40px;
         border-radius: 20px;
-        color: white;
+        color: #0f172a;
         margin-bottom: 24px;
-        box-shadow: 0 14px 35px -10px rgba(37, 99, 235, 0.35);
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.8);
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
     .hero-banner p, .hero-banner div, .hero-banner span {
-        color: white !important;
+        color: #0f172a !important;
     }
     .hero-title {
         font-size: 32px;
         font-weight: 700;
         letter-spacing: -0.8px;
-        background: linear-gradient(135deg, #ffffff 0%, #bae6fd 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 0;
@@ -146,17 +121,17 @@ st.markdown("""
     .hero-subtitle {
         margin: 6px 0 0 0;
         font-size: 14px;
-        color: #e2e8f0 !important;
-        font-weight: 400 !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
     }
     .hero-badge {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #38bdf8 !important;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        color: #0369a1 !important;
         padding: 8px 16px;
         border-radius: 30px;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: 0.5px;
         display: inline-flex;
         align-items: center;
@@ -497,20 +472,6 @@ if "localization" not in st.session_state:
 
 if "uploaded_file" not in st.session_state:
     st.session_state.uploaded_file = None
-
-
-# =====================================================================
-# GLOBAL TOP NAVIGATION BAR
-# =====================================================================
-st.markdown("""
-<div class="top-nav">
-    <a href="#">Home</a>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
-    <a href="#">Signup</a>
-    <a href="#">Login</a>
-</div>
-""", unsafe_allow_html=True)
 
 
 # =====================================================================
