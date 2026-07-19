@@ -381,24 +381,20 @@ st.markdown("""
         margin-bottom: 6px;
     }
     
-    /* 8. Medical Action Button with Frosted Glass Aesthetic */
+    /* 8. Medical Action Button with White Text */
     @keyframes pulse-glow {
-        0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); }
-        70% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+        70% { box-shadow: 0 0 0 12px rgba(168, 85, 247, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
     }
     
     .stButton > button, 
     .stDownloadButton > button, 
     div[data-testid="stDownloadButton"] > button,
-    div[data-testid="stFormSubmitButton"] > button,
-    div[data-testid="stFileUploader"] button,
-    section[data-testid="stFileUploaderDropzone"] button {
-        background: rgba(255, 255, 255, 0.6) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        color: #0f172a !important;
-        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    div[data-testid="stFormSubmitButton"] > button {
+        background: linear-gradient(to right, #a855f7, #3b82f6, #2dd4bf) !important;
+        color: #ffffff !important;
+        border: none !important;
         border-radius: 14px !important;
         padding: 18px 32px !important;
         font-size: 16px !important;
@@ -406,17 +402,15 @@ st.markdown("""
         text-transform: uppercase !important;
         letter-spacing: 0.8px !important;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07) !important;
+        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3) !important;
         width: 100% !important;
     }
     .stButton > button *, 
     .stDownloadButton > button *, 
     div[data-testid="stDownloadButton"] > button *,
-    div[data-testid="stFormSubmitButton"] > button *,
-    div[data-testid="stFileUploader"] button *,
-    section[data-testid="stFileUploaderDropzone"] button * {
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
+    div[data-testid="stFormSubmitButton"] > button * {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
         font-weight: 700 !important;
     }
     .stButton > button {
@@ -424,13 +418,9 @@ st.markdown("""
     }
     .stButton > button:hover, 
     .stDownloadButton > button:hover, 
-    div[data-testid="stDownloadButton"] > button:hover,
-    div[data-testid="stFormSubmitButton"] > button:hover,
-    div[data-testid="stFileUploader"] button:hover,
-    section[data-testid="stFileUploaderDropzone"] button:hover {
+    div[data-testid="stDownloadButton"] > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 12px 28px rgba(31, 38, 135, 0.12) !important;
-        background: rgba(255, 255, 255, 0.8) !important;
+        box-shadow: 0 12px 28px rgba(168, 85, 247, 0.45) !important;
         opacity: 0.96 !important;
     }
     .stButton > button:active,
