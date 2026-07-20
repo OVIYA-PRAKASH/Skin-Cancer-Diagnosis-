@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Model weights and checkpoints
+checkpoints/
+*.pth
+*.pt
+
+# Execution outputs and tensorboard event logs
+logs/
+outputs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE configurations
+.vscode/
+.idea/
+
+# Ignore raw data files inside the dataset folder
+dataset/HAM10000_images_part_1/
+dataset/HAM10000_images_part_2/
+metadata/*.tab
+metadata/*.csv

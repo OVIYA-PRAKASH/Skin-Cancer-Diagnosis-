@@ -1,0 +1,64 @@
+# Path Configuration
+# These are relative to the SkinCancerAI/ directory, allowing easy adjustment on Google Colab.
+paths:
+  metadata_path: "../Datasets/HAM10000_metadata.tab"
+  image_dirs:
+    - "../Datasets/HAM10000_images_part_1"
+    - "../Datasets/HAM10000_images_part_2"
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+  output_dir: "outputs"
+
+# Data Pipeline Configuration
+data:
+  image_size: 224          # Height/width to resize images (224 is standard for pretrained networks)
+  batch_size: 16           # Batch size optimized for GTX 1650 (4GB VRAM) to prevent OOM
+  num_workers: 4           # Number of CPU workers for dataloading
+  train_val_test_split:    # Ratios for stratified dataset partitioning
+    - 0.8
+    - 0.1
+    - 0.1
+  seed: 42                 # Seed for full run reproducibility
+
+# Model Hyperparameters
+model:
+  cnn_backbone: "efficientnet_b0"      # Options: "efficientnet_b0", "resnet18", "resnet34"
+  transformer_backbone: "vit_b_16"     # Options: "vit_b_16", "deit_tiny" (DeiT)
+  pretrained: true                     # Use ImageNet pretrained weights
+  dropout: 0.3                         # Dropout rate in final classification head
+  metadata_embed_dim: 64               # Dimension to embed clinical tabular data into
+  fusion_dim: 256                      # Dimension of the final fused projection layer
+
+# Training Orchestration
+training:
+  epochs: 30
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  optimizer: "adamw"                   # Options: "adamw", "adam", "sgd"
+  scheduler: "cosine"                  # Options: "cosine", "plateau", "none"
+  amp: true                            # Enable Automatic Mixed Precision (FP16) for VRAM/speed optimization
+  early_stopping_patience: 5           # Stop training if validation loss doesn't improve for 5 epochs
+  early_stopping_min_delta: 0.001      # Minimum change to qualify as an improvement
+  gradient_accumulation_steps: 1       # Simulate larger batches (e.g. 2 means effective batch size = batch_size * 2)
+
+# Ablation Study Configurations
+# Used to systematically disable modalities to measure their research contributions
+ablation:
+  mode: "multimodal"                   # Options: "multimodal" (Image+Meta), "image_only", "metadata_only"
+  image_mode: "hybrid"                 # Options: "hybrid" (CNN+Transformer), "cnn_only", "vit_only"
+
+# Multi-Stage Validation & Calibrated Inference Settings (Phases 1-9)
+validation:
+  min_width: 100
+  min_height: 100
+  max_width: 4000
+  max_height: 4000
+  blur_threshold: 100.0                # Threshold for Laplacian variance blur check
+  solid_color_std_threshold: 5.0       # Threshold for standard deviation to check solid colors
+  skin_threshold: 0.15                 # Minimum percentage of skin pixels required (e.g. 15%)
+  lesion_threshold: 0.01               # Minimum ratio of image area for a valid skin lesion contour (e.g. 1%)
+
+inference:
+  confidence_threshold: 0.60           # Threshold under which classification is overridden to Unknown
+  calibration_temperature: 1.2         # Temperature scaling denominator for Softmax calibration
+

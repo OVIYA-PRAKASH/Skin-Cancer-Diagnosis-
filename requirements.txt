@@ -1,0 +1,22 @@
+# Core Deep Learning Framework
+torch
+torchvision
+
+# Data Manipulation & Processing
+numpy
+pandas
+pillow
+
+# Machine Learning & Evaluation Utilities
+scikit-learn
+
+# Configuration Management
+pyyaml
+
+# Logging, Visualization & Monitoring
+tensorboard
+matplotlib
+seaborn
+
+# Clinician UI Dashboard
+streamlit
