@@ -247,13 +247,20 @@ st.markdown("""
         color: #0f172a !important;
     }
     div[data-testid="stFileUploader"] button {
-        background: linear-gradient(135deg, #0f172a 0%, #0d9488 100%) !important;
+        background: linear-gradient(to right, #a855f7, #3b82f6, #2dd4bf) !important;
         color: #ffffff !important;
         border-radius: 8px !important;
         border: none !important;
+        padding: 8px 16px !important;
     }
     div[data-testid="stFileUploader"] button * {
+        display: none !important;
+    }
+    div[data-testid="stFileUploader"] button::before {
+        content: "✨ Select Dermoscopic Image" !important;
         color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
     }
     
     /* 7. Stepper Status Cards with Gradients */
