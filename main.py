@@ -164,7 +164,8 @@ def run_training(config: Config, device: torch.device, logger) -> None:
         batch_size=config.data.batch_size,
         shuffle=True,
         num_workers=config.data.num_workers,
-        pin_memory=True if device.type == "cuda" else False
+        pin_memory=True if device.type == "cuda" else False,
+        drop_last=True
     )
     
     val_loader = DataLoader(
