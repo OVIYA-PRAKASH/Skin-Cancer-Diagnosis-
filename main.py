@@ -100,9 +100,9 @@ def setup_cli() -> argparse.ArgumentParser:
     return parser
 
 
-def run_training(config: Config, device: torch.device, logger) -> None:
-    """Runs the training and validation loops."""
-    logger.info("Starting training orchestration...")
+def run_training(config: Config, device: torch.device, logger, resume: bool = False) -> None:
+    """Executes the full training pipeline."""
+    logger.info("Starting Dataset Pipeline for Training...")
 
     # 1. Load metadata and check physical disk files
     loader = MetadataLoader(
@@ -225,6 +225,9 @@ def run_training(config: Config, device: torch.device, logger) -> None:
         use_amp=config.training.amp,
         max_grad_norm=1.0
     )
+
+    if resume:
+        trainer.load_checkpoint(os.path.join(config.paths.checkpoint_dir, "last_model.pth"))
 
     trainer.fit()
 
@@ -398,7 +401,7 @@ def main(args: List[str]) -> None:
     # Sub-command dispatcher
     if parsed_args.mode == "train":
         logger.info(f"Starting training process. Resume flag: {parsed_args.resume}")
-        run_training(config, device, logger)
+        run_training(config, device, logger, parsed_args.resume)
     elif parsed_args.mode == "evaluate":
         logger.info(f"Evaluating model checkpoint: {parsed_args.checkpoint}")
         run_evaluation(config, parsed_args.checkpoint, device, logger)

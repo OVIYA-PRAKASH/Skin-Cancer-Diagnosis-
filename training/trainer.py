@@ -96,9 +96,27 @@ class MultiModalTrainer:
         }
         
         self.best_f1 = 0.0
+        self.start_epoch = 0
         logger.info(
             f"Trainer initialized [AMP: {self.use_amp} | Weight Decay: {weight_decay} | Epochs: {self.epochs}]"
         )
+
+    def load_checkpoint(self, path: str) -> None:
+        """Loads a saved checkpoint to resume training."""
+        if not os.path.exists(path):
+            logger.warning(f"Resume requested, but checkpoint {path} not found. Starting from scratch.")
+            return
+
+        logger.info(f"Loading checkpoint from {path}...")
+        # Add weights_only=True to prevent PyTorch warnings about untrusted pickles
+        checkpoint = torch.load(path, map_location=self.device, weights_only=False)
+        self.model.load_state_dict(checkpoint["model_state_dict"])
+        self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        self.history = checkpoint.get("history", self.history)
+        self.best_f1 = checkpoint.get("best_f1", 0.0)
+        self.start_epoch = checkpoint.get("epoch", 0)
+        logger.info(f"Successfully resumed from Epoch {self.start_epoch} with Best F1: {self.best_f1:.4f}")
 
     def train_epoch(self, epoch: int) -> float:
         """
@@ -201,7 +219,7 @@ class MultiModalTrainer:
         logger.info(f"Starting model training for {self.epochs} epochs...")
         total_start = time.time()
 
-        for epoch in range(1, self.epochs + 1):
+        for epoch in range(self.start_epoch + 1, self.epochs + 1):
             epoch_start = time.time()
 
             # 1. Run training epoch
