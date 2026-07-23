@@ -25,7 +25,7 @@ model:
   cnn_backbone: "efficientnet_b0"      # Options: "efficientnet_b0", "resnet18", "resnet34"
   transformer_backbone: "vit_b_16"     # Options: "vit_b_16", "deit_tiny" (DeiT)
   pretrained: true                     # Use ImageNet pretrained weights
-  dropout: 0.3                         # Dropout rate in final classification head
+  dropout: 0.5                         # Dropout rate in final classification head
   metadata_embed_dim: 64               # Dimension to embed clinical tabular data into
   fusion_dim: 256                      # Dimension of the final fused projection layer
 
@@ -33,7 +33,7 @@ model:
 training:
   epochs: 30
   learning_rate: 0.0001
-  weight_decay: 0.01
+  weight_decay: 0.05
   optimizer: "adamw"                   # Options: "adamw", "adam", "sgd"
   scheduler: "cosine"                  # Options: "cosine", "plateau", "none"
   amp: true                            # Enable Automatic Mixed Precision (FP16) for VRAM/speed optimization
