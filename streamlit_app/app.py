@@ -1,8 +1,9 @@
 """
-Phase 18: Streamlit Web Application.
+Phase 18: Streamlit Web Application (Formal Enterprise Medical Interface).
 Implements the interactive clinician dashboard app.py under streamlit_app/.
 Features two-page session navigation: line-by-line input collection on Page 1,
 and diagnostic analysis / explainability visualizations on Page 2.
+Strictly formal medical color palette (Navy/Slate/Blue) and text-only presentation (zero emojis/icons).
 """
 
 import sys
@@ -30,29 +31,27 @@ from explainability.gradcam import GradCAM
 logger = logging.getLogger("SkinCancerAI.StreamlitApp")
 
 # =====================================================================
-# SYSTEM INITIALIZATION & STYLING
+# SYSTEM INITIALIZATION & FORMAL STYLING
 # =====================================================================
 st.set_page_config(
-    page_title="SkinCancerAI Clinician Diagnostics",
-    page_icon="🔬",
+    page_title="SkinCancerAI Clinical Diagnostic Console",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom premium CSS styling overrides (Multi-Page Navigation & Line-by-Line Forms)
+# Custom Formal Medical CSS Styling (Strictly Text-Only, Slate & Deep Navy Palette)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
     
-    /* 1. Global Page Background & Soft Multi-Gradient Canvas */
+    /* 1. Global Page Canvas - Neutral Light Slate */
     .stApp {
-        background: linear-gradient(to right, #f3e7ff, #d4fcff) !important;
-        background-attachment: fixed !important;
+        background-color: #f8fafc !important;
         color: #0f172a !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
     }
     
-    /* Hide default Streamlit banners & force remove sidebar completely */
+    /* Hide default Streamlit headers & sidebar completely */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -62,138 +61,118 @@ st.markdown("""
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 4rem !important;
-        max-width: 1100px !important;
-        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        max-width: 1120px !important;
     }
     
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* 2. Text Visibility Guarantees Across All Streamlit Elements */
+    /* 2. Strict Text Visibility & Typography Hierarchy */
     p, span, label, h1, h2, h3, h4, h5, h6, input, select, option,
     div[data-testid="stMarkdownContainer"] p,
     div[data-testid="stWidgetLabel"] label,
     div[data-testid="stWidgetLabel"] p,
     .stSelectbox label, .stTextInput label, .stSlider label, .stFileUploader label {
         color: #0f172a !important;
-        font-weight: 600 !important;
-    }
-    
-    small {
-        color: #334155 !important;
         font-weight: 500 !important;
     }
     
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Outfit', sans-serif !important;
-        color: #0f172a !important;
+    small {
+        color: #475569 !important;
+        font-weight: 400 !important;
     }
     
-    /* 3. Top Header Hero Banner */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', sans-serif !important;
+        color: #0f172a !important;
+        letter-spacing: -0.3px;
+    }
+    
+    /* 3. Formal Executive Header Banner */
     .hero-banner {
-        background: rgba(255, 255, 255, 0.6) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        padding: 32px 40px;
-        border-radius: 20px;
-        color: #0f172a;
+        background-color: #0f172a !important;
+        padding: 28px 36px;
+        border-radius: 12px;
+        color: #ffffff;
         margin-bottom: 24px;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
-        border: 1px solid rgba(255, 255, 255, 0.8);
+        border: 1px solid #1e293b;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
     .hero-banner p, .hero-banner div, .hero-banner span {
-        color: #0f172a !important;
+        color: #ffffff !important;
     }
     .hero-title {
-        font-size: 32px;
+        font-size: 26px;
         font-weight: 700;
-        letter-spacing: -0.8px;
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+        color: #ffffff !important;
         margin: 0;
+        font-family: 'Inter', sans-serif;
     }
     .hero-subtitle {
         margin: 6px 0 0 0;
-        font-size: 14px;
-        color: #475569 !important;
-        font-weight: 500 !important;
+        font-size: 13px;
+        color: #94a3b8 !important;
+        font-weight: 400 !important;
     }
     .hero-badge {
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(15, 23, 42, 0.1);
-        color: #0369a1 !important;
-        padding: 8px 16px;
-        border-radius: 30px;
-        font-size: 13px;
-        font-weight: 700;
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        color: #cbd5e1 !important;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
         letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        text-transform: uppercase;
     }
     
-    /* 4. Line-by-Line Section Card Wrappers */
+    /* 4. Formal Card Sections */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: linear-gradient(135deg, #ffffff 0%, #f0f7fc 100%) !important;
-        border: 1.5px solid #cbd5e1 !important;
-        border-radius: 18px !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 12px !important;
         padding: 20px 24px !important;
         margin-bottom: 16px !important;
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04) !important;
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover {
-        transform: translateY(-2px) !important;
-        border-color: #0d9488 !important;
-        box-shadow: 0 12px 28px rgba(13, 148, 136, 0.12) !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03) !important;
     }
     
     .section-header {
-        font-family: 'Outfit', sans-serif;
-        font-size: 18px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
         font-weight: 700;
-        background: linear-gradient(135deg, #0369a1 0%, #0d9488 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 12px;
-        padding-bottom: 6px;
-        border-bottom: 2px solid #e2e8f0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        color: #0f172a !important;
+        margin-bottom: 14px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+        letter-spacing: -0.2px;
     }
     
-    /* Patient Context Summary Bar on Results Page */
+    /* 5. Patient Context Summary Bar */
     .patient-summary-bar {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border-radius: 16px;
-        padding: 16px 24px;
-        margin-bottom: 24px;
-        color: white;
+        background-color: #1e293b;
+        border-radius: 10px;
+        padding: 14px 22px;
+        margin-bottom: 20px;
+        color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
+        border: 1px solid #334155;
     }
     .patient-summary-bar span, .patient-summary-bar strong {
-        color: white !important;
+        color: #f8fafc !important;
+        font-size: 13px;
     }
     
-    /* 5. Complete BaseWeb Selectbox Popover & Dropdown Fix */
+    /* 6. Form Inputs & Selectboxes */
     div[data-baseweb="select"] > div {
-        background: #ffffff !important;
-        border: 1.5px solid #0d9488 !important;
-        border-radius: 10px !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
         color: #0f172a !important;
     }
     div[data-baseweb="select"] svg {
-        fill: #0f172a !important;
+        fill: #475569 !important;
     }
     div[data-baseweb="select"] input {
         color: #0f172a !important;
@@ -201,215 +180,191 @@ st.markdown("""
     
     div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {
         background-color: #ffffff !important;
-        border: 1.5px solid #0d9488 !important;
-        border-radius: 12px !important;
-        box-shadow: 0 12px 35px rgba(15, 23, 42, 0.2) !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important;
     }
     div[data-baseweb="popover"] *, ul[role="listbox"] * {
         color: #0f172a !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
     }
     li[role="option"], div[role="option"], ul[role="listbox"] li {
         background-color: #ffffff !important;
         color: #0f172a !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-        padding: 10px 14px !important;
-        border-radius: 8px !important;
-        margin: 2px 4px !important;
+        font-weight: 500 !important;
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+        border-radius: 6px !important;
+        margin: 2px !important;
     }
     li[role="option"]:hover, li[role="option"][aria-selected="true"], ul[role="listbox"] li:hover {
-        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
-        color: #0369a1 !important;
+        background-color: #f1f5f9 !important;
+        color: #1e40af !important;
     }
     
     input[type="text"] {
         background-color: #ffffff !important;
         color: #0f172a !important;
-        border: 1.5px solid #94a3b8 !important;
-        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
     }
     .stSlider > div [data-baseweb="slider"] {
         background-color: transparent !important;
     }
     
-    /* 6. File Uploader Custom Light Dropzone */
+    /* 7. File Uploader - Formal Dashed Dropzone */
     div[data-testid="stFileUploader"], 
     div[data-testid="stFileUploader"] section, 
     div[data-testid="stFileUploaderDropzone"],
     div[data-testid="stFileUploader"] > div {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-        border: 2px dashed #0d9488 !important;
-        border-radius: 16px !important;
+        background-color: #ffffff !important;
+        border: 1.5px dashed #cbd5e1 !important;
+        border-radius: 10px !important;
         color: #0f172a !important;
     }
     div[data-testid="stFileUploader"] * {
         color: #0f172a !important;
     }
     div[data-testid="stFileUploader"] button {
-        background: linear-gradient(to right, #a855f7, #3b82f6, #2dd4bf) !important;
+        background-color: #1e40af !important;
         color: #ffffff !important;
-        border-radius: 8px !important;
+        border-radius: 6px !important;
         border: none !important;
-        padding: 8px 16px !important;
+        padding: 6px 14px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
     }
     div[data-testid="stFileUploader"] button * {
-        display: none !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
     }
     div[data-testid="stFileUploader"] button::before {
-        content: "✨ Select Dermoscopic Image" !important;
+        content: "Select File" !important;
         color: #ffffff !important;
-        font-weight: 700 !important;
-        font-size: 14px !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
     }
     
-    /* 7. Stepper Status Cards with Gradients */
+    /* 8. Stepper Status Cards */
     .stepper-container {
         display: flex;
-        gap: 14px;
-        margin: 20px 0 28px 0;
+        gap: 12px;
+        margin: 16px 0 20px 0;
         width: 100%;
     }
     .stepper-card {
         flex: 1;
-        background: linear-gradient(135deg, #ffffff 0%, #f0f7fc 100%);
-        border: 1.5px solid #cbd5e1;
-        border-radius: 14px;
-        padding: 16px;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 14px;
         position: relative;
-        overflow: hidden;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-    }
-    .stepper-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
     }
     .step-num {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         color: #64748b !important;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 0.5px;
     }
     .step-title {
         font-size: 14px;
         font-weight: 700;
         color: #0f172a !important;
-        margin-top: 4px;
+        margin-top: 2px;
     }
-    .step-icon {
-        position: absolute;
-        top: 14px;
-        right: 14px;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: bold;
+    .step-status {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 6px;
+        letter-spacing: 0.5px;
     }
     .step-desc {
         font-size: 12px;
-        color: #334155 !important;
-        margin-top: 8px;
-        line-height: 1.4;
+        color: #475569 !important;
+        margin-top: 4px;
+        line-height: 1.3;
     }
     .step-success {
-        border-left: 4px solid #10b981;
-        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        border-left: 3px solid #16a34a;
     }
-    .step-success .step-icon {
-        background-color: #a7f3d0;
-        color: #047857 !important;
-        border: 1px solid #34d399;
+    .step-success .step-status {
+        color: #16a34a !important;
     }
     .step-fail {
-        border-left: 4px solid #ef4444;
-        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border-left: 3px solid #dc2626;
     }
-    .step-fail .step-icon {
-        background-color: #fca5a5;
-        color: #991b1b !important;
-        border: 1px solid #f87171;
+    .step-fail .step-status {
+        color: #dc2626 !important;
     }
     .step-pending {
-        border-left: 4px solid #94a3b8;
-        opacity: 0.75;
+        border-left: 3px solid #94a3b8;
     }
-    .step-pending .step-icon {
-        background-color: #e2e8f0;
-        color: #475569 !important;
-        border: 1px solid #cbd5e1;
+    .step-pending .step-status {
+        color: #64748b !important;
     }
     
-    /* Badges */
+    /* 9. Formal Disease Severity Badges */
     .badge {
         display: inline-block;
-        padding: 6px 14px;
-        border-radius: 30px;
+        padding: 4px 10px;
+        border-radius: 4px;
         font-weight: 700;
         font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.5px;
     }
     .badge-malignant {
-        background-color: #fee2e2;
+        background-color: #fef2f2;
         color: #991b1b !important;
-        border: 1px solid #fca5a5;
+        border: 1px solid #fecaca;
     }
     .badge-benign {
-        background-color: #d1fae5;
-        color: #065f46 !important;
-        border: 1px solid #6ee7b7;
+        background-color: #f0fdf4;
+        color: #166534 !important;
+        border: 1px solid #bbf7d0;
     }
     .badge-warning {
-        background-color: #fef3c7;
+        background-color: #fffbeeb;
         color: #92400e !important;
-        border: 1px solid #fcd34d;
+        border: 1px solid #fef3c7;
     }
     
     .guideline-box {
-        background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
-        border-left: 4px solid #0d9488;
-        padding: 22px;
-        border-radius: 0 16px 16px 0;
-        margin-top: 20px;
-        border-top: 1px solid #cbd5e1;
-        border-right: 1px solid #cbd5e1;
-        border-bottom: 1px solid #cbd5e1;
+        background-color: #f8fafc;
+        border-left: 3px solid #1e40af;
+        padding: 16px 20px;
+        border-radius: 0 8px 8px 0;
+        margin-top: 14px;
+        border-top: 1px solid #e2e8f0;
+        border-right: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
     }
     .probability-label {
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 600;
         color: #0f172a !important;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
     
-    /* 8. Medical Action Button with White Text */
-    @keyframes pulse-glow {
-        0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
-        70% { box-shadow: 0 0 0 12px rgba(168, 85, 247, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
-    }
-    
+    /* 10. Formal Medical Action Buttons */
     .stButton > button, 
     .stDownloadButton > button, 
     div[data-testid="stDownloadButton"] > button,
     div[data-testid="stFormSubmitButton"] > button {
-        background: linear-gradient(to right, #a855f7, #3b82f6, #2dd4bf) !important;
+        background-color: #1e40af !important;
         color: #ffffff !important;
         border: none !important;
-        border-radius: 14px !important;
-        padding: 18px 32px !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
+        border-radius: 8px !important;
+        padding: 14px 28px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.8px !important;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3) !important;
+        letter-spacing: 0.5px !important;
+        transition: background-color 0.2s ease !important;
+        box-shadow: 0 2px 4px rgba(30, 64, 175, 0.15) !important;
         width: 100% !important;
     }
     .stButton > button *, 
@@ -418,21 +373,17 @@ st.markdown("""
     div[data-testid="stFormSubmitButton"] > button * {
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
-        font-weight: 700 !important;
-    }
-    .stButton > button {
-        animation: pulse-glow 2.5s infinite !important;
+        font-weight: 600 !important;
     }
     .stButton > button:hover, 
     .stDownloadButton > button:hover, 
     div[data-testid="stDownloadButton"] > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 12px 28px rgba(168, 85, 247, 0.45) !important;
-        opacity: 0.96 !important;
+        background-color: #1e3a8a !important;
+        box-shadow: 0 4px 8px rgba(30, 58, 138, 0.25) !important;
     }
     .stButton > button:active,
     .stDownloadButton > button:active {
-        transform: translateY(0px) !important;
+        background-color: #1e293b !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -440,7 +391,7 @@ st.markdown("""
 
 # Cache resource to prevent loading model weights multiple times
 @st.cache_resource
-def load_inference_engine(config_path: str, model_path: str, preprocessor_path: str, cache_buster: int = 1) -> InferenceEngine:
+def load_inference_engine(config_path: str, model_path: str, preprocessor_path: str, cache_buster: int = 2) -> InferenceEngine:
     """Loads and caches the inference engine."""
     return InferenceEngine(
         config_path=config_path,
@@ -449,7 +400,7 @@ def load_inference_engine(config_path: str, model_path: str, preprocessor_path: 
     )
 
 
-# Resolve checkpoint directory paths absolute to the script location
+# Resolve checkpoint directory paths absolute to script location
 app_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(app_dir, ".."))
 
@@ -482,79 +433,79 @@ if "uploaded_file" not in st.session_state:
 
 
 # =====================================================================
-# PAGE 1: LINE-BY-LINE CASE INPUT FORM
+# PAGE 1: FORMAL CASE INPUT FORM
 # =====================================================================
 if st.session_state.current_page == "input":
-    # Hero Banner
+    # Formal Hero Banner
     st.markdown("""
     <div class="hero-banner">
         <div>
             <div class="hero-title">SkinCancerAI Clinical Diagnostic Console</div>
-            <div class="hero-subtitle">Step 1 of 2: Line-by-Line Patient Case Entry & Dermoscopic Image Upload</div>
+            <div class="hero-subtitle">Step 1 of 2: Patient Case Entry and Dermoscopic Image Upload</div>
         </div>
         <div class="hero-badge">
-            <span>●</span> Form Entry Mode
+            Form Entry Mode
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     if not checkpoints_exist:
         st.warning(
-            "⚠️ Trained checkpoints not found in checkpoints/! Please run the training pipeline first."
+            "Trained checkpoints not found in checkpoints/ folder. Please run the training pipeline first."
         )
 
-    # Line 1: Patient Case ID
+    # Section 1: Patient Case ID
     with st.container(border=True):
-        st.markdown('<div class="section-header">1. Patient Case Identification</div>', unsafe_allow_html=True)
-        patient_id_val = st.text_input("Enter unique medical record / case identifier", value=st.session_state.patient_id)
+        st.markdown('<div class="section-header">Section 1: Patient Case Identification</div>', unsafe_allow_html=True)
+        patient_id_val = st.text_input("Medical record or case identifier", value=st.session_state.patient_id)
         st.session_state.patient_id = patient_id_val
 
-    # Line 2: Patient Age
+    # Section 2: Patient Age
     with st.container(border=True):
-        st.markdown('<div class="section-header">2. Patient Age Demographics</div>', unsafe_allow_html=True)
-        age_val = st.slider("Select biological age of the patient (Years)", min_value=0, max_value=100, value=int(st.session_state.age))
+        st.markdown('<div class="section-header">Section 2: Patient Age Demographics</div>', unsafe_allow_html=True)
+        age_val = st.slider("Patient biological age (Years)", min_value=0, max_value=100, value=int(st.session_state.age))
         st.session_state.age = age_val
 
-    # Line 3: Biological Sex
+    # Section 3: Biological Sex
     with st.container(border=True):
-        st.markdown('<div class="section-header">3. Biological Sex Specification</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Section 3: Biological Sex Specification</div>', unsafe_allow_html=True)
         sex_idx = ["Male", "Female", "Unknown"].index(st.session_state.sex) if st.session_state.sex in ["Male", "Female", "Unknown"] else 0
-        sex_val = st.selectbox("Select patient biological sex category", ["Male", "Female", "Unknown"], index=sex_idx)
+        sex_val = st.selectbox("Patient biological sex category", ["Male", "Female", "Unknown"], index=sex_idx)
         st.session_state.sex = sex_val
 
-    # Line 4: Anatomical Site
+    # Section 4: Anatomical Site
     with st.container(border=True):
-        st.markdown('<div class="section-header">4. Anatomical Site Localization</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Section 4: Anatomical Site Localization</div>', unsafe_allow_html=True)
         loc_options = [
             "Back", "Abdomen", "Chest", "Face", "Neck", "Scalp", "Trunk",
             "Upper Extremity", "Lower Extremity", "Hand", "Foot", "Genital", "Acral",
             "Ear", "Unknown"
         ]
         loc_idx = loc_options.index(st.session_state.localization) if st.session_state.localization in loc_options else 0
-        loc_val = st.selectbox("Select primary body lesion site", loc_options, index=loc_idx)
+        loc_val = st.selectbox("Primary body lesion site", loc_options, index=loc_idx)
         st.session_state.localization = loc_val
 
-    # Line 5: Dermoscopic Image Upload
+    # Section 5: Dermoscopic Image Upload
     with st.container(border=True):
-        st.markdown('<div class="section-header">5. Dermoscopic Image Photograph</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Section 5: Dermoscopic Image Upload</div>', unsafe_allow_html=True)
         uploaded_file_val = st.file_uploader(
-            "Upload raw high-resolution skin lesion photograph (JPG, JPEG, PNG format)",
+            "Upload high-resolution skin lesion photograph (JPG, JPEG, PNG format)",
             type=["jpg", "jpeg", "png"]
         )
         if uploaded_file_val is not None:
             st.session_state.uploaded_file = uploaded_file_val
             image_preview = Image.open(uploaded_file_val)
-            st.image(image_preview, caption="Uploaded Lesion Photograph Preview", width=350)
+            st.image(image_preview, caption="Uploaded Lesion Photograph Preview", width=320)
 
     st.markdown("---")
     
-    # Submit Action Button
-    submit_btn = st.button("🚀 Submit Case Parameters & View AI Diagnostics", use_container_width=True)
+    # Submit Action Button (Text-Only)
+    submit_btn = st.button("SUBMIT CASE PARAMETERS FOR DIAGNOSTIC ANALYSIS", use_container_width=True)
     if submit_btn:
         if st.session_state.uploaded_file is None:
-            st.error("❌ Please upload a dermoscopic image in Line 5 above before submitting.")
+            st.error("Error: Please upload a dermoscopic image in Section 5 above before submitting.")
         elif not checkpoints_exist:
-            st.error("❌ Cannot process diagnostics: Model weights missing from checkpoints/.")
+            st.error("Error: Cannot process diagnostics. Model weights missing from checkpoints/ folder.")
         else:
             st.session_state.current_page = "results"
             st.rerun()
@@ -567,19 +518,19 @@ elif st.session_state.current_page == "results":
     # Top Navigation Header
     col_nav1, col_nav2 = st.columns([1, 4])
     with col_nav1:
-        if st.button("← Edit Patient Inputs", use_container_width=True):
+        if st.button("EDIT PATIENT INPUTS", use_container_width=True):
             st.session_state.current_page = "input"
             st.rerun()
 
-    # Hero Banner
+    # Formal Hero Banner
     st.markdown("""
     <div class="hero-banner">
         <div>
             <div class="hero-title">SkinCancerAI Clinical Diagnostic Console</div>
-            <div class="hero-subtitle">Step 2 of 2: AI Multi-Modal Diagnostics, Grad-CAM Visualizations & Clinical Guidelines</div>
+            <div class="hero-subtitle">Step 2 of 2: Multi-Modal AI Diagnostics, Grad-CAM Visualizations and Clinical Guidelines</div>
         </div>
         <div class="hero-badge">
-            <span>●</span> Results Display
+            Diagnostic Analysis Mode
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -597,13 +548,13 @@ elif st.session_state.current_page == "results":
     # Load image
     image = Image.open(st.session_state.uploaded_file)
     
-    with st.spinner("Executing multi-stage validation and neural forward pass..."):
+    with st.spinner("Executing multi-stage validation and neural network inference..."):
         try:
             engine = load_inference_engine(
                 config_path=config_file,
                 model_path=model_file,
                 preprocessor_path=preprocessor_file,
-                cache_buster=8
+                cache_buster=9
             )
             
             temp_img_path = os.path.join(project_root, "temp_lesion.jpg")
@@ -612,69 +563,69 @@ elif st.session_state.current_page == "results":
             is_valid, validation_results = engine.run_pipeline_validation(temp_img_path)
             
             with st.container(border=True):
-                st.markdown('<div class="section-header">📋 Multi-Stage Image Validation Pipeline</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-header">Multi-Stage Image Validation Pipeline</div>', unsafe_allow_html=True)
                 
                 val_res = validation_results["image_validation"]
                 step1_class = "step-success" if val_res["passed"] else "step-fail"
-                step1_icon = "✓" if val_res["passed"] else "✗"
+                step1_status = "PASSED" if val_res["passed"] else "FAILED"
                 step1_sub = f"Size: {val_res['metrics'].get('width')}x{val_res['metrics'].get('height')}" if val_res["passed"] else val_res["message"]
 
                 skin_res = validation_results["skin_detection"]
                 if skin_res["message"] == "Pending":
                     step2_class = "step-pending"
-                    step2_icon = "—"
+                    step2_status = "PENDING"
                     step2_sub = "Pending"
                 elif skin_res["passed"]:
                     step2_class = "step-success"
-                    step2_icon = "✓"
+                    step2_status = "PASSED"
                     step2_sub = f"Skin Ratio: {skin_res['metrics'].get('skin_ratio', 0.0)*100:.1f}%"
                 else:
                     step2_class = "step-fail"
-                    step2_icon = "✗"
+                    step2_status = "FAILED"
                     step2_sub = skin_res["message"]
 
                 lesion_res = validation_results["lesion_detection"]
                 if lesion_res["message"] == "Pending":
                     step3_class = "step-pending"
-                    step3_icon = "—"
+                    step3_status = "PENDING"
                     step3_sub = "Pending"
                 elif lesion_res["passed"]:
                     step3_class = "step-success"
-                    step3_icon = "✓"
+                    step3_status = "PASSED"
                     step3_sub = f"Lesion Ratio: {lesion_res['metrics'].get('max_lesion_area_ratio', 0.0)*100:.2f}%"
                 else:
                     step3_class = "step-fail"
-                    step3_icon = "✗"
+                    step3_status = "FAILED"
                     step3_sub = lesion_res["message"]
 
                 step4_class = "step-success" if is_valid else "step-pending"
-                step4_icon = "✓" if is_valid else "—"
+                step4_status = "PASSED" if is_valid else "SKIPPED"
                 step4_sub = "Executed" if is_valid else "Skipped"
 
                 st.markdown(f"""
                 <div class="stepper-container">
                     <div class="stepper-card {step1_class}">
-                        <div class="step-num">1</div>
-                        <div class="step-title">Image Check</div>
-                        <div class="step-icon">{step1_icon}</div>
+                        <div class="step-num">Step 1</div>
+                        <div class="step-title">Image Validation</div>
+                        <div class="step-status">{step1_status}</div>
                         <div class="step-desc">{step1_sub}</div>
                     </div>
                     <div class="stepper-card {step2_class}">
-                        <div class="step-num">2</div>
-                        <div class="step-title">Skin Search</div>
-                        <div class="step-icon">{step2_icon}</div>
+                        <div class="step-num">Step 2</div>
+                        <div class="step-title">Skin Detection</div>
+                        <div class="step-status">{step2_status}</div>
                         <div class="step-desc">{step2_sub}</div>
                     </div>
                     <div class="stepper-card {step3_class}">
-                        <div class="step-num">3</div>
-                        <div class="step-title">Lesion Focus</div>
-                        <div class="step-icon">{step3_icon}</div>
+                        <div class="step-num">Step 3</div>
+                        <div class="step-title">Lesion Search</div>
+                        <div class="step-status">{step3_status}</div>
                         <div class="step-desc">{step3_sub}</div>
                     </div>
                     <div class="stepper-card {step4_class}">
-                        <div class="step-num">4</div>
-                        <div class="step-title">Inference</div>
-                        <div class="step-icon">{step4_icon}</div>
+                        <div class="step-num">Step 4</div>
+                        <div class="step-title">Neural Inference</div>
+                        <div class="step-status">{step4_status}</div>
                         <div class="step-desc">{step4_sub}</div>
                     </div>
                 </div>
@@ -683,7 +634,7 @@ elif st.session_state.current_page == "results":
             if not is_valid:
                 if os.path.exists(temp_img_path):
                     os.remove(temp_img_path)
-                st.error("❌ Diagnostics halted: The uploaded image failed validation checks. Refer to status cards above.")
+                st.error("Diagnostics Halted: The uploaded image failed validation checks. Refer to pipeline status steps above.")
                 st.stop()
 
             pred_class, probs, report_path = engine.predict_and_explain(
@@ -715,81 +666,81 @@ elif st.session_state.current_page == "results":
             is_undetermined = "Undetermined" in disease_info.get("severity", "")
             badge_style = "badge-malignant" if is_malignant else "badge-warning" if is_undetermined else "badge-benign"
             
-            st.success("✅ Multi-modal diagnostics compiled!")
+            st.info("Multi-modal diagnostic inference complete.")
             
             confidence_val = probs.get(pred_class, max(probs.values()))
             
             with st.container(border=True):
                 if pred_class == "unknown":
                     st.markdown(f"""
-                    <div style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); padding: 24px; border-radius: 18px; margin-bottom: 10px; border: 1.5px solid #fecaca; box-shadow: 0 4px 15px rgba(229, 62, 62, 0.08);">
-                        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #c53030; font-weight: 700; margin-bottom: 6px;">Primary Diagnostic Prediction</div>
-                        <div style="font-size: 26px; font-weight: 700; color: #9b1c1c; margin: 4px 0; font-family: 'Outfit', sans-serif;">{disease_info.get('name', 'Unknown Category (Low Confidence)')}</div>
-                        <div style="margin-top: 12px; display: flex; align-items: center; gap: 15px;">
+                    <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #fecaca;">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #991b1b; font-weight: 700; margin-bottom: 4px;">Primary Diagnostic Category</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #7f1d1d; margin: 4px 0; font-family: 'Inter', sans-serif;">{disease_info.get('name', 'Unknown Category (Low Confidence)')}</div>
+                        <div style="margin-top: 10px; display: flex; align-items: center; gap: 14px;">
                             <span class="badge {badge_style}">{disease_info.get('severity', 'Undetermined')}</span>
-                            <span style="font-weight: 600; font-size: 15px; color: #c53030;">{(confidence_val*100):.2f}% Calibrated Confidence (Below Threshold)</span>
+                            <span style="font-weight: 600; font-size: 14px; color: #991b1b;">{(confidence_val*100):.2f}% Calibrated Confidence (Below Threshold)</span>
                         </div>
-                        <p style="margin-top: 18px; font-size: 14px; color: #742a2a; line-height: 1.6; font-style: italic; border-top: 1px solid rgba(229, 62, 62, 0.15); padding-top: 12px;">
+                        <p style="margin-top: 14px; font-size: 13px; color: #7f1d1d; line-height: 1.5; border-top: 1px solid #fecaca; padding-top: 10px;">
                             <strong>System Note:</strong> {disease_info.get('guideline')}
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown(f"""
-                    <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%); padding: 24px; border-radius: 18px; margin-bottom: 10px; border: 1.5px solid #bae6fd; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08);">
-                        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #0369a1; font-weight: 700; margin-bottom: 6px;">Predicted Diagnosis</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #0c4a6e; margin: 4px 0; font-family: 'Outfit', sans-serif;">{disease_info.get('name', pred_class)}</div>
-                        <div style="margin-top: 12px; display: flex; align-items: center; gap: 15px;">
+                    <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #cbd5e1;">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #1e40af; font-weight: 700; margin-bottom: 4px;">Predicted Diagnostic Category</div>
+                        <div style="font-size: 26px; font-weight: 700; color: #0f172a; margin: 4px 0; font-family: 'Inter', sans-serif;">{disease_info.get('name', pred_class)}</div>
+                        <div style="margin-top: 10px; display: flex; align-items: center; gap: 14px;">
                             <span class="badge {badge_style}">{disease_info.get('severity', 'Benign')}</span>
-                            <span style="font-weight: 600; font-size: 16px; color: #0284c7;">{(confidence_val*100):.2f}% Calibrated Confidence</span>
+                            <span style="font-weight: 600; font-size: 15px; color: #1e40af;">{(confidence_val*100):.2f}% Calibrated Confidence</span>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
 
             with st.container(border=True):
-                st.markdown('<div class="section-header">🔍 Explainable AI Visualizations</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-header">Explainable AI Visualizations</div>', unsafe_allow_html=True)
                 col_img1, col_img2 = st.columns(2)
                 with col_img1:
-                    st.image(raw_np, caption="Original Dermoscopic Input", use_container_width=True)
+                    st.image(raw_np, caption="Original Dermoscopic Input Image", use_container_width=True)
                 with col_img2:
-                    st.image(blended_np, caption="Grad-CAM CNN Hotspot Overlay", use_container_width=True)
+                    st.image(blended_np, caption="Grad-CAM Neural Attention Hotspot Overlay", use_container_width=True)
 
             with st.container(border=True):
-                st.markdown('<div class="section-header">📊 Calibrated Probability Distribution</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-header">Calibrated Probability Distribution</div>', unsafe_allow_html=True)
                 
-                # Distinct color palette for each disease category
+                # Formal Muted Clinical Color Palette for Metrics
                 disease_color_map = {
-                    "mel": "#ef4444",     # Melanoma: Crimson Red
-                    "nv": "#10b981",      # Melanocytic Nevus: Emerald Green
-                    "bcc": "#dc2626",     # Basal Cell Carcinoma: Deep Ruby Red
-                    "akiec": "#f97316",   # Actinic Keratoses: Amber Orange
-                    "bkl": "#14b8a6",     # Benign Keratosis: Mint Cyan
-                    "df": "#6366f1",      # Dermatofibroma: Royal Indigo
-                    "vasc": "#a855f7",    # Vascular Lesions: Vivid Purple
-                    "unknown": "#64748b"  # Low Confidence / Undetermined: Charcoal Slate
+                    "mel": "#991b1b",     # Melanoma: Muted Dark Red
+                    "bcc": "#b91c1c",     # Basal Cell Carcinoma: Muted Crimson
+                    "akiec": "#c2410c",   # Actinic Keratoses: Muted Rust
+                    "bkl": "#475569",     # Benign Keratosis: Muted Slate Gray
+                    "df": "#334155",      # Dermatofibroma: Muted Dark Slate
+                    "vasc": "#1e40af",    # Vascular Lesions: Formal Medical Blue
+                    "nv": "#15803d",      # Melanocytic Nevus: Muted Dark Green
+                    "unknown": "#64748b"  # Low Confidence / Undetermined: Neutral Gray
                 }
                 
                 sorted_probs = sorted(probs.items(), key=lambda item: item[1], reverse=True)
                 for code, val in sorted_probs:
                     name = engine.report_generator.DISEASE_INFO.get(code, {}).get("name", code)
                     pct = val * 100
-                    bar_color = disease_color_map.get(code.lower(), "#3b82f6")
+                    bar_color = disease_color_map.get(code.lower(), "#1e40af")
                     st.markdown(f"""
                     <div class="probability-label">{name} ({code.upper()})</div>
-                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                        <div style="background-color: #cbd5e1; height: 10px; border-radius: 5px; overflow: hidden; flex-grow: 1; border: 1px solid #94a3b8;">
-                            <div style="width: {pct}%; height: 100%; background: {bar_color}; border-radius: 5px; box-shadow: 0 0 8px {bar_color}60;"></div>
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div style="background-color: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; flex-grow: 1;">
+                            <div style="width: {pct}%; height: 100%; background-color: {bar_color}; border-radius: 4px;"></div>
                         </div>
-                        <div style="font-weight: 700; width: 65px; text-align: right; font-size: 13px; color: #0f172a; font-family: 'Outfit', sans-serif; margin-left: 10px;">{pct:.2f}%</div>
+                        <div style="font-weight: 600; width: 65px; text-align: right; font-size: 13px; color: #0f172a; font-family: 'Inter', sans-serif; margin-left: 10px;">{pct:.2f}%</div>
                     </div>
                     """, unsafe_allow_html=True)
 
             with st.container(border=True):
-                st.markdown('<div class="section-header">📋 Clinical Notes & Guidelines</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-header">Clinical Pathology Notes and Guidelines</div>', unsafe_allow_html=True)
                 st.markdown(f"""
                 <div class="guideline-box">
-                    <p style="margin: 0 0 10px 0; color: #0f172a;"><strong>Pathology Summary:</strong> {disease_info.get('desc')}</p>
-                    <p style="margin: 0; color: #0f766e;"><strong>Clinical Recommendation:</strong> {disease_info.get('guideline')}</p>
+                    <p style="margin: 0 0 8px 0; color: #0f172a;"><strong>Pathology Summary:</strong> {disease_info.get('desc')}</p>
+                    <p style="margin: 0; color: #1e40af;"><strong>Clinical Recommendation:</strong> {disease_info.get('guideline')}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -799,7 +750,7 @@ elif st.session_state.current_page == "results":
                 
                 st.markdown("---")
                 st.download_button(
-                    label="📥 Download Clinical Diagnostic Report (HTML)",
+                    label="DOWNLOAD CLINICAL DIAGNOSTIC REPORT (HTML)",
                     data=html_report,
                     file_name=f"clinical_report_{st.session_state.patient_id}.html",
                     mime="text/html",
@@ -807,5 +758,5 @@ elif st.session_state.current_page == "results":
                 )
 
         except Exception as e:
-            st.error(f"An error occurred during diagnostics processing: {str(e)}")
+            st.error(f"An error occurred during diagnostic processing: {str(e)}")
             logger.exception("Streamlit inference processing error:")
