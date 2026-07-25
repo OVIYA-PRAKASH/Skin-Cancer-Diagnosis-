@@ -76,3 +76,14 @@ To enforce high clinical trust, the system features a multi-stage validation and
 5. **Phases 4 & 5: Thresholding & Unknown Class:** If the maximum calibrated probability is below `confidence_threshold` (e.g. 60%), the final classification is overridden to `"unknown"` (Unknown Category) with a warning recommendation, preventing forced disease categorization.
 6. **Phase 8: Logging:** Directs telemetry streams across separate log files under `logs/`: `validation.log`, `inference.log`, and `prediction.log`.
 
+---
+
+## Project Team & Authors
+
+| Contributor Name | GitHub Username | Role |
+|---|---|---|
+| **NithishMee** | [@NithishMee](https://github.com/NithishMee) | Lead Machine Learning & Pipeline Developer |
+| **Oviya P** | [@OVIYA-PRAKASH](https://github.com/OVIYA-PRAKASH) | Project Contributor |
+| **Monika Subramani** | [@Monikasubramani](https://github.com/Monikasubramani) | Project Contributor |
+
+
